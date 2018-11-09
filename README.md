@@ -1,4 +1,4 @@
-# Weave Scope - Troubleshooting & Monitoring for Docker & Kubernetes
+# RaspberryPI Linux discribution customization helper
 
 This project collects some scripts and specific adjustements the helps me to customize an "out of the box" Raspberry distro.
 
