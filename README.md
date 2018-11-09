@@ -11,7 +11,7 @@ See bin/mount_to_tmpfs_overlay
 
 It allows to remount an existing file system to tmpfs to preserve the microSD card by preventing any write operation to some targeted folders, like "/var"
 
-## others to come...
+## And others to come...
 
 ## <a name="getting-started"></a>Getting started
 
