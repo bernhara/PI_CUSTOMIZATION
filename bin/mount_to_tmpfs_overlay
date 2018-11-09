@@ -35,13 +35,24 @@
 #
 #        the further arguments are passed to to the "overlay" mounting command.
 #        So you may specify any usual mount arg, such as "ro"
-
-DEBUG=1
-[ -n "${DEBUG}" ] && set -x
+#
+# Limitations:
+#
+#    * The unmount process does not unmount the automatically created overlay nore the tmpfs
 
 DIR="$1"
 
-[ -z "${DIR}" ] && exit 1
+if [ -z "${DIR}" ]
+then
+    echo "Directory name required" 1>&2
+    exit 1
+fi
+
+if [ ! -d "${DIR}" ]
+then
+    echo "Target must be an already existing directory" 1>&2
+    exit 1
+fi
 
 shift
 
