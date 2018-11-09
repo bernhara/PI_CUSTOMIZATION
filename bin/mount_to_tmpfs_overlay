@@ -1,0 +1,114 @@
+#!/bin/bash
+# -*- mode: sh -*-
+
+#
+#
+#  /usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:.
+
+DEBUG=1
+[ -n "${DEBUG}" ] && set -x
+
+DIR="$1"
+
+[ -z "${DIR}" ] && exit 1
+
+shift
+
+if [ "$1" == "-o" ]
+then
+    shift
+    mount_options="$1"
+else
+    mount_options=''
+fi
+
+declare -a mount_options_array=(
+    $(
+	IFS=','
+	set -- ${mount_options}
+	echo "$@"
+    )
+)
+
+get_argument_value ()
+{
+    arg_specification="$1"
+    arg_value=$(
+	IFS='='
+	set -- ${arg_specification}
+	echo "$2"
+    )
+    echo "${arg_value}"
+}
+    
+
+debug=false
+tmpfs_size=200M
+extra_mount_option_list=''
+overlay_root_location=/mnt/overlays/$( basename "${DIR}" )
+
+for a in ${mount_options_array[@]}
+do
+
+    echo "A: $a"
+    case "${a}" in
+	debug*)
+	    DEBUG=true
+	    ;;
+
+	size=*)
+	    tmpfs_size=$( get_argument_value "$a" )
+	    ;;
+
+	overlay_root_location=*)
+	    overlay_root_location=$( get_argument_value "$a" )
+	    ;;
+
+	*)
+	    extra_mount_option_list="${extra_mount_option_list},${a}"
+	    ;;
+    esac
+
+done
+
+if [ -n "${DEBUG}" ]
+then
+    echo "Args:"
+    echo "$@"
+fi
+
+# TODO: find another way to check if overlay is available in the kernel
+#! if ! grep -q overlay /proc/filesystems
+#! then
+#!     echo "Filesystem overlay is not available. You need a kernel update: apt-get update && apt-get upgrade"  1>&2
+#!     exit 2
+#! fi
+
+if [ ! -d ${overlay_root_location}/overlay ]
+then
+    mkdir -p ${overlay_root_location}/overlay
+fi
+
+#
+# check if target folder must be created as a tmpfs
+#
+overlay_fstype=$( stat -f -c '%T' ${overlay_root_location}/overlay )
+
+if [ "${overlay_fstype}" != "tmpfs" ]
+then
+    mount -t tmpfs -o size=${tmpfs_size} tmpfs ${overlay_root_location}/overlay
+fi
+
+# Create structure in overlay folder
+mkdir -p ${overlay_root_location}/overlay/upper
+mkdir -p ${overlay_root_location}/overlay/work
+
+# remount twice the initial folder to have still (ro) access to the lower content
+mkdir -p ${overlay_root_location}/overlay/lower
+mount --bind -o ro "${DIR}" ${overlay_root_location}/overlay/lower
+
+# renount the initial folder on to of the overlay
+mount -t overlay \
+      -o lowerdir=${overlay_root_location}/overlay/lower,upperdir=${overlay_root_location}/overlay/upper,workdir=${overlay_root_location}/overlay/work${extra_mount_option_list} \
+      overlay \
+      "${DIR}"
