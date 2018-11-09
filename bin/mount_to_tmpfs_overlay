@@ -2,8 +2,39 @@
 # -*- mode: sh -*-
 
 #
+# This script implements a handler for "fuse mounts".
 #
-#  /usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:.
+# To make the system use this handler, a corresponding "mount" command should be issued.
+#
+# When mounting an *already existing* directory D in mount_to_tmpfs_overlay mode, the directory D will be *remounted*
+# on top of an overlay. This overlay is created inside a newly created created tmpfs file system.
+# The result is that any further change to the directory D will me made in tmpfs and will not be commited
+# to the initial storage location
+# 
+# For example, to use the mount_to_tmpfs_overlay mode in /etc/fstab, you can specify the fillowing line for example
+#
+#      mount_to_tmpfs_overlay  /var            fuse    size=200M,debug,defaults        0 0
+#
+# where:
+#    "mount_to_tmpfs_overlay": is the name of that script.
+#     The script should be located either in /usr/local/bin, /usr/local/sbin, /usr/bin, /usr/sbin, /bin or /sbin
+#     which is the PATH configuration at boot time
+#     The script may simply be symbolically link to one of these locations.
+#
+#     /var: the folder which will be *remounted* to a tmpfs overlay
+#
+#     Mount args:
+#        "size" mount arg: the size of the tpmfs which will be created to hold the overlay
+#        default value: 200M
+#
+#        "debug": activates some traces while script execution
+#
+#        "overlay_root_location": the root folder where the needed directory scructure will be created.
+#        default value: /mnt/overlays/<remounted directory basename>
+#        
+#
+#        the further arguments are passed to to the "overlay" mounting command.
+#        So you may specify any usual mount arg, such as "ro"
 
 DEBUG=1
 [ -n "${DEBUG}" ] && set -x
