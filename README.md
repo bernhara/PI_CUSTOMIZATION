@@ -5,11 +5,11 @@ My goal is to have everything working independly from the distribution, but I ca
 
 The main features are the following.
 
-### "mount_to_tmpfs_overlay" fuse mount facility
+### Preserving the microSD card with the "mount_to_tmpfs_overlay" fuse mount facility
 
 See bin/mount_to_tmpfs_overlay
 
-It allows to remount an existing file system to tmpfs to preserve the microSD card
+It allows to remount an existing file system to tmpfs to preserve the microSD card by preventing any write operation to some targeted folders, like "/var"
 
 ### others to come...
 
