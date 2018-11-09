@@ -1,38 +1,21 @@
 # Weave Scope - Troubleshooting & Monitoring for Docker & Kubernetes
 
-[![Circle CI](https://circleci.com/gh/weaveworks/scope/tree/master.svg?style=shield)](https://circleci.com/gh/weaveworks/scope/tree/master)
-[![Coverage Status](https://coveralls.io/repos/weaveworks/scope/badge.svg)](https://coveralls.io/r/weaveworks/scope)
-[![Go Report Card](https://goreportcard.com/badge/github.com/weaveworks/scope)](https://goreportcard.com/report/github.com/weaveworks/scope)
-[![Slack Status](https://slack.weave.works/badge.svg)](https://slack.weave.works)
-[![Docker Pulls](https://img.shields.io/docker/pulls/weaveworks/scope.svg?maxAge=604800)](https://hub.docker.com/r/weaveworks/scope/)
-[![GoDoc](https://godoc.org/github.com/weaveworks/scope?status.svg)](https://godoc.org/github.com/weaveworks/scope)
+This project collects some scripts and specific adjustements the helps me to customize an "out of the box" Raspberry distro.
 
-Weave Scope automatically generates a map of your application, enabling you to
-intuitively understand, monitor, and control your containerized, microservices based application.
+The main features are
 
-### Understand your Docker containers in real-time
+### mount_to_tmpfs_overlay fuse mount facility
 
-<img src="imgs/topology.png" width="200" alt="Map you architecture" align="right">
+See bin/mount_to_tmpfs_overlay
 
-Choose an overview of your container infrastructure, or focus on a specific microservice. Easily identify and correct issues to ensure the stability and performance of your containerized applications.
+It allows to remount an existing file system to tmpfs to preserve the microSD card
 
-### Contextual details and deep linking
-
-<img src="imgs/selected.png" width="200" alt="Focus on a single container" align="right">
-
-View contextual metrics, tags and metadata for your containers.  Effortlessly navigate between processes inside your container to hosts your containers run on, arranged in expandable, sortable tables.  Easily find the container using the most CPU or memory for a given host or service.
-
-### Interact with and manage containers
-
-<img src="imgs/terminals.png" width="200" alt="Launch a command line." align="right">
-
-Interact with your containers directly: pause, restart and stop containers. Launch a command line. All without leaving the scope browser window.
-
-### Extend and customize via plugins
-
-Add custom details or interactions for your hosts, containers and/or processes by creating Scope plugins; or just choose from some that others have already written at the Github [Weaveworks Scope Plugins](https://github.com/weaveworks-plugins/) organization.
+### others to come...
 
 ## <a name="getting-started"></a>Getting started
+
+- toto
+- titi
 
 ```
 sudo curl -L git.io/scope -o /usr/local/bin/scope
@@ -50,12 +33,4 @@ For instructions on installing Scope on [Kubernetes](https://www.weave.works/doc
 
 If you have any questions about, feedback for or problems with Scope:
 
-- Read [the Weave Scope docs](https://www.weave.works/docs/scope/latest/introducing/).
-- Invite yourself to the <a href="https://weaveworks.github.io/community-slack/" target="_blank"> #weave-community </a> slack channel.
-- Ask a question on the <a href="https://weave-community.slack.com/messages/general/"> #weave-community</a> slack channel.
-- Join the <a href="https://www.meetup.com/pro/Weave/"> Weave User Group </a> and get invited to online talks, hands-on training and meetups in your area.
-- Send an email to <a href="mailto:weave-users@weave.works">weave-users@weave.works</a>
-- <a href="https://github.com/weaveworks/scope/issues/new">File an issue.</a>
-
-Your feedback is always welcome!
 
