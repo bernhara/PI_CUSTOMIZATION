@@ -43,7 +43,8 @@
 #
 # Global configuration params
 : ${OVERLAY_BASE_DIR:=/tmp}
-
+: ${TMPFS_DEFAULT_SIZE:=200M}
+: ${SHARE_PREVIOUS_CREATED_OVERLAY_BASE_DIR:=""}
 
 DIR="$1"
 
@@ -90,9 +91,9 @@ get_argument_value ()
     
 
 debug=false
-tmpfs_size=200M
+tmpfs_size=${TMPFS_DEFAULT_SIZE}
 extra_mount_option_list=''
-overlay_mount_location=${OVERLAY_BASE_DIR}/overlays/$( basename "${DIR}" )}
+overlay_mount_location="${OVERLAY_BASE_DIR}/overlays/$( basename "${DIR}" )"
 
 for a in ${mount_options_array[@]}
 do
@@ -119,8 +120,14 @@ done
 
 if [ -n "${DEBUG}" ]
 then
-    echo "Args:"
-    echo "$@"
+    (
+	echo "Args:"
+	echo "$@"
+	echo "Exec onfiguration:"
+	echo "	tmpfs_size=${tmpfs_size}"
+	echo "	extra_mount_option_list=${extra_mount_option_list}"
+	echo "	overlay_mount_location=${overlay_mount_location}"
+    ) 1>&2
 fi
 
 # TODO: find another way to check if overlay is available in the kernel
@@ -130,18 +137,32 @@ fi
 #!     exit 2
 #! fi
 
+set -x
+
 if [ ! -d ${overlay_mount_location}/overlay ]
 then
     mkdir -p ${overlay_mount_location}/overlay
 fi
 
-#
-# check if target folder must be created as a tmpfs
-#
-overlay_fstype=$( stat -f -c '%T' ${overlay_mount_location}/overlay )
-
-if [ "${overlay_fstype}" != "tmpfs" ]
+if [ -n "${SHARE_PREVIOUS_CREATED_OVERLAY_BASE_DIR}" ]
 then
+    #
+    # share the underlying tmpfs if already created
+    #
+
+    #
+    # check if target folder must be created as already tmpfs
+    #
+    overlay_fstype=$( stat -f -c '%T' ${overlay_mount_location}/overlay )
+
+    if [ "${overlay_fstype}" != "tmpfs" ]
+    then
+	mount -t tmpfs -o size=${tmpfs_size} tmpfs ${overlay_mount_location}/overlay
+    fi
+else
+    #
+    # directly create the tmpfs
+    #
     mount -t tmpfs -o size=${tmpfs_size} tmpfs ${overlay_mount_location}/overlay
 fi
 
