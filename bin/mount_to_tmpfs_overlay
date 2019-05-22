@@ -97,7 +97,6 @@ overlay_mount_location=${OVERLAY_BASE_DIR}/overlays/$( basename "${DIR}" )}
 for a in ${mount_options_array[@]}
 do
 
-    echo "A: $a"
     case "${a}" in
 	debug*)
 	    DEBUG=true
