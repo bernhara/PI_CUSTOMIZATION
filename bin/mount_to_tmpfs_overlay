@@ -137,8 +137,6 @@ fi
 #!     exit 2
 #! fi
 
-set -x
-
 if [ ! -d ${overlay_mount_location}/overlay ]
 then
     mkdir -p ${overlay_mount_location}/overlay
