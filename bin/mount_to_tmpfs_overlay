@@ -40,6 +40,11 @@
 #
 #    * The unmount process does not unmount the automatically created overlay nore the tmpfs
 
+#
+# Global configuration params
+: ${OVERLAY_BASE_DIR:=/tmp}
+
+
 DIR="$1"
 
 if [ -z "${DIR}" ]
@@ -87,7 +92,7 @@ get_argument_value ()
 debug=false
 tmpfs_size=200M
 extra_mount_option_list=''
-overlay_root_location=/mnt/overlays/$( basename "${DIR}" )
+overlay_mount_location=${OVERLAY_BASE_DIR}/overlays/$( basename "${DIR}" )}
 
 for a in ${mount_options_array[@]}
 do
@@ -102,8 +107,8 @@ do
 	    tmpfs_size=$( get_argument_value "$a" )
 	    ;;
 
-	overlay_root_location=*)
-	    overlay_root_location=$( get_argument_value "$a" )
+	overlay_mount_location=*)
+	    overlay_mount_location=$( get_argument_value "$a" )
 	    ;;
 
 	*)
@@ -126,31 +131,31 @@ fi
 #!     exit 2
 #! fi
 
-if [ ! -d ${overlay_root_location}/overlay ]
+if [ ! -d ${overlay_mount_location}/overlay ]
 then
-    mkdir -p ${overlay_root_location}/overlay
+    mkdir -p ${overlay_mount_location}/overlay
 fi
 
 #
 # check if target folder must be created as a tmpfs
 #
-overlay_fstype=$( stat -f -c '%T' ${overlay_root_location}/overlay )
+overlay_fstype=$( stat -f -c '%T' ${overlay_mount_location}/overlay )
 
 if [ "${overlay_fstype}" != "tmpfs" ]
 then
-    mount -t tmpfs -o size=${tmpfs_size} tmpfs ${overlay_root_location}/overlay
+    mount -t tmpfs -o size=${tmpfs_size} tmpfs ${overlay_mount_location}/overlay
 fi
 
 # Create structure in overlay folder
-mkdir -p ${overlay_root_location}/overlay/upper
-mkdir -p ${overlay_root_location}/overlay/work
+mkdir -p ${overlay_mount_location}/overlay/upper
+mkdir -p ${overlay_mount_location}/overlay/work
 
 # remount twice the initial folder to have still (ro) access to the lower content
-mkdir -p ${overlay_root_location}/overlay/lower
-mount --bind -o ro "${DIR}" ${overlay_root_location}/overlay/lower
+mkdir -p ${overlay_mount_location}/overlay/lower
+mount --bind -o ro "${DIR}" ${overlay_mount_location}/overlay/lower
 
 # renount the initial folder on to of the overlay
 mount -t overlay \
-      -o lowerdir=${overlay_root_location}/overlay/lower,upperdir=${overlay_root_location}/overlay/upper,workdir=${overlay_root_location}/overlay/work${extra_mount_option_list} \
+      -o lowerdir=${overlay_mount_location}/overlay/lower,upperdir=${overlay_mount_location}/overlay/upper,workdir=${overlay_mount_location}/overlay/work${extra_mount_option_list} \
       overlay \
       "${DIR}"
